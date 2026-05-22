@@ -209,3 +209,61 @@ DELIMITER ;
 
 CALL PoblarEmpleadosAleatorios();
 CALL PoblarFactSalariosHistorico();
+
+-- 7. VERIFICACIÓN DE CONTEOS DE REGISTROS
+-- Comprueba que las dimensiones tienen datos y la tabla Fact superó el mínimo de 1,000 filas.
+
+SELECT 'DIM_DEPARTAMENTOS' AS tabla, COUNT(*) AS total_registros FROM DIM_DEPARTAMENTOS
+UNION ALL
+SELECT 'DIM_SEDES', COUNT(*) FROM DIM_SEDES
+UNION ALL
+SELECT 'DIM_TIEMPO', COUNT(*) FROM DIM_TIEMPO
+UNION ALL
+SELECT 'DIM_EMPLEADOS', COUNT(*) FROM DIM_EMPLEADOS
+UNION ALL
+SELECT 'FACT_SALARIOS', COUNT(*) FROM FACT_SALARIOS;
+
+-- 8. CONSULTAR DIMENSIONES MAESTRAS (PEQUEÑAS)
+
+-- Ver todos los departamentos de la empresa (5 registros)
+SELECT * FROM DIM_DEPARTAMENTOS;
+
+-- Ver todas las sedes configuradas en El Salvador (4 registros)
+SELECT * FROM DIM_SEDES;
+
+-- Ver el calendario de meses para el análisis histórico (12 registros)
+SELECT * FROM DIM_TIEMPO;
+
+
+-- 9. CONSULTAR DIMENSIÓN DE EMPLEADOS
+
+-- Ver los 100 empleados generados aleatoriamente con sus DUIs y puestos
+SELECT * FROM DIM_EMPLEADOS;
+
+
+-- 10. CONSULTAR TABLA DE HECHOS (LA MÁS GRANDE)
+
+-- Ver los 1,200 registros de pagos mensuales de salarios
+SELECT * FROM FACT_SALARIOS;
+
+-- 11. Consulta para verificacion de datos
+SELECT 
+    f.salario_id,
+    e.nombre_completo AS empleado,
+    e.puesto_cargo AS puesto,
+    d.nombre_departamento AS departamento,
+    s.nombre_sede AS sede,
+    s.departamento_geo AS departamento_salvador,
+    t.nombre_mes AS mes_pago,
+    f.salario_base,
+    f.bonos,
+    f.deducciones,
+    f.salario_neto
+FROM FACT_SALARIOS f
+JOIN DIM_EMPLEADOS e ON f.empleado_key = e.empleado_key
+JOIN DIM_DEPARTAMENTOS d ON f.departamento_key = d.departamento_key
+JOIN DIM_SEDES s ON f.sede_key = s.sede_key
+JOIN DIM_TIEMPO t ON f.tiempo_key = t.tiempo_key
+LIMIT 5;
+
+
